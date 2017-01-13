@@ -1,0 +1,1 @@
+PACKAGECONFIG = "fb-imx6-glesv2"

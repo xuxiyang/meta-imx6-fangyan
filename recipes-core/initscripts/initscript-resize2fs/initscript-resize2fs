@@ -1,0 +1,21 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          initscript-resize2fs
+# Required-Start:    $local_fs
+# Required-Stop:     $local_fs
+# Default-Start:     S
+# Default-Stop:
+# Short-Description: imx6 board startup script
+### END INIT INFO
+
+export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+if [[ ! -e /etc/resize2fs.hasran ]]; then
+    if [ -e /dev/mmcblk1p3 ]; then
+        /sbin/resize2fs /dev/mmcblk1p3  >> /dev/null 2>&1
+    fi
+    if [ -e /dev/mmcblk2p3 ]; then
+        /sbin/resize2fs /dev/mmcblk2p3  >> /dev/null 2>&1
+    fi
+    touch /etc/resize2fs.hasran
+fi

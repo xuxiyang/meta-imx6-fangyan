@@ -1,0 +1,26 @@
+From 8b7b1cf705a208fdb98a7d97e5ea8e957c441d87 Mon Sep 17 00:00:00 2001
+From: yuanguang <yuanguang@autoio.cn>
+Date: Wed, 28 Sep 2016 09:29:54 +0800
+Subject: [PATCH] Fix string argument syntax
+
+Signed-off-by: yuanguang <yuanguang@autoio.cn>
+---
+ configure.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.in b/configure.in
+index 5cc5e5c..21502bf 100644
+--- a/configure.in
++++ b/configure.in
+@@ -70,7 +70,7 @@ fi
+ #
+ # Check for DirectFB
+ #
+-PKG_CHECK_MODULES(DIRECTFB, directfb >= 0.9.24)
++PKG_CHECK_MODULES([DIRECTFB], directfb >= 0.9.24)
+ 
+ AC_CHECK_FUNCS([getopt getopt_long])
+ 
+-- 
+2.7.4
+

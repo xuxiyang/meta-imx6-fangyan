@@ -1,0 +1,3 @@
+EXTRA_COMPILER_FLAGS += "-DLINUX=1 -DEGL_API_FB=1"
+EXTRA_LINKER_FLAGS += "-static-libgcc"
+EGLFS_GPU = "eglfs_viv"

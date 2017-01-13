@@ -1,0 +1,162 @@
+#!/bin/bash
+
+function mk_error()
+{
+	echo -e "\033[31mERROR: $*\033[0m"
+}
+
+function mk_warn()
+{
+	echo -e "\033[33mWARN: $*\033[0m"
+}
+
+function mk_info()
+{
+	echo -e "\033[32mINFO: $*\033[0m"
+}
+
+function usage()
+{
+	mk_error "`basename $0` pro-file-name";
+	mk_warn " pro-file-name must be *.pro(qmake project file)"
+}
+
+# This function can select the resources. arg is one of $OTHERRESOURCES, such as fonts ...
+function res_select()
+{
+	arg=$1
+	T=`echo ${OTHERRESOURCES} | grep -w "$arg"`
+	if [[ -n $T ]]; then
+		mk_info "this project include $arg"
+		rm -rf ./dashboard-initfs/usr/lib/$arg
+		cp -rf $PRODIR/$arg ./dashboard-initfs/usr/lib/
+	fi
+}
+
+function qtdepends_create()
+{
+	arg=$1
+	T=`echo ${QTDEPENDS} | grep -w "$arg"`
+	if [[ -n $T ]]; then
+		mk_info "this project include $arg"
+			# tar cvjf ${arg}-static-qmlplugins.tar.bz2 usr
+		tar xvjf ${arg}-static-qmlplugins.tar.bz2
+		if [[ $? != 0 ]]; then
+			mk_error "no such ${T}-static-qmlplugins.tar.bz2, please check ..."
+			exit 1;
+		fi
+	fi
+}
+
+function check_all_images()
+{
+	IMAGE_HAS_ERROR="no"
+	FILE_LIST=`find $1 -type f -name "*.png" 2>/dev/null`
+
+	for filename in $FILE_LIST; do
+		RESULT=`pngcheck -v $filename  | grep "chunk iCCP"`
+		if [[ -n $RESULT ]]; then
+			IMAGE_HAS_ERROR="yes"
+			mk_warn $filename$RESULT
+		fi
+	done
+
+	if [[ $IMAGE_HAS_ERROR == "yes" ]]; then
+		mk_error "We don't support chunk iCCP in image!"
+		mk_error "Please correct the error in the above images!"
+		exit 1;
+	fi
+}
+
+
+if [ $# != 1 ]; then
+	usage
+	exit 1;
+fi
+
+PRODIR=`dirname $1`
+PRODIRABS=$(cd `dirname $1`; pwd)
+PRONAME=`basename $1`
+
+check_all_images $PRODIR
+
+QtQuickCompilerConfig=`grep -e "^CONFIG\ +=\ qtquickcompiler" $1`
+if [[ -z $QtQuickCompilerConfig ]]; then
+	mk_error "\"CONFIG += qtquickcompiler\" not enabled in $PRONAME, cannot make.initfs for it"
+	exit 1;
+fi
+
+QtDbCommitConfig=`grep -e "^CONFIG\ +=\ qtdbcommit" $1`
+if [[ -z $QtDbCommitConfig ]]; then
+	mk_error "\"CONFIG += qtdbcommit\" not enabled in $PRONAME, cannot make.initfs for it"
+	exit 1;
+fi
+
+destdir=`grep -e ^DESTDIR $1 | awk -F " = " '{print $2}'`
+if [[ -z $destdir ]]; then
+	mk_warn "there is no \"DESTDIR\" in $PRONAME, now using `pwd` as \"DESTDIR\""
+	destdir="."
+fi
+
+targetname=`grep -e ^TARGET $1 | awk -F "TARGET " '{print $2}' | awk -F "= " '{print $2}'`
+if [[ -z $targetname ]]; then
+	mk_warn "there is no \"TARGET\" in $PRONAME, now using ${PRONAME%.pro} as \"TARGET\""
+	targetname=${PRONAME%.pro}
+fi
+
+TARGETPATH="$(pwd)""/""$destdir""/static/""$targetname"
+
+QTMODULES=`grep -e "QT\ +=" $1 | sed -e "s/^.*QT\ += //g"`
+QTDEPENDS=`grep -e "Other\ QT\ Depends\ +=" $1 | sed -e "s/^.*Other\ QT\ Depends\ += //g"`
+OTHERRESOURCES=`grep -e INSTALLS\ += $1 | sed -e "s/^.*INSTALLS\ += //g"`
+
+qmake $PRODIRABS/$PRONAME && make distclean && qmake $PRODIRABS/$PRONAME && make -j4
+if [[ $? != 0 ]]; then
+	mk_error "build error, please check ...";
+	exit 1;
+fi
+$STRIP $TARGETPATH
+
+rm -rf ./dashboard-initfs
+tar xvjf $OECORE_NATIVE_SYSROOT/usr/bin/dashboard-initfs.tar.bz2 -C ./
+
+#generate start run.
+rm -rf ./dashboard-initfs/startup/*
+cp $TARGETPATH ./dashboard-initfs/startup/run
+
+#generate font(*.ttf, *.ttc)
+res_select "fonts"
+res_select "videos"
+res_select "audios"
+res_select "models"
+res_select "images"
+res_select "js"
+res_select "qml"
+res_select "others"
+
+cd ./dashboard-initfs
+
+qtdepends_create "glitem"
+qtdepends_create "imageitem"
+qtdepends_create "carstatusqml"
+qtdepends_create "qtquickcontrols"
+qtdepends_create "qtquickcontrols2"
+qtdepends_create "qtgraphicaleffects"
+qtdepends_create "videoimageitem"
+
+rm *.tar.bz2
+
+cd ../
+tar cvjf dashboard-initfs.tar.bz2 dashboard-initfs
+rm -rf initroot
+mv dashboard-initfs initroot
+find initroot | cpio -o -H newc > initroot.cpio
+packimg -p512 -n initroot.cpio@0x13800000 dashboard-initfs.cpio.packimg
+
+mv dashboard-initfs.cpio.packimg initfs.img
+gzip -c initfs.img > initfs.img.gz
+
+rm -rf initroot
+rm -rf initroot.cpio
+
+mk_info "make completely."

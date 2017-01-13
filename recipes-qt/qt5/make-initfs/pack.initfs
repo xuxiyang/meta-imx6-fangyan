@@ -1,0 +1,25 @@
+#!/bin/bash
+
+if [ $# != 1 ]; then
+    echo -e "\033[31m\nUsage: pack.initfs folder-name\033[0m"
+    exit 1;
+fi
+
+if [ dashboard-initfs != $1 ]; then
+    rm -rf dashboard-initfs
+    mv $1 dashboard-initfs
+fi
+
+tar cvjf dashboard-initfs.tar.bz2 dashboard-initfs
+rm -rf initroot
+mv dashboard-initfs initroot
+find initroot | cpio -o -H newc > initroot.cpio
+packimg -p512 -n initroot.cpio@0x13800000 dashboard-initfs.cpio.packimg
+
+mv dashboard-initfs.cpio.packimg initfs.img
+gzip -c initfs.img > initfs.img.gz
+
+rm -rf initroot
+rm -rf initroot.cpio
+
+echo -e "\033[32m\nINFO:pack completely.\033[0m"
