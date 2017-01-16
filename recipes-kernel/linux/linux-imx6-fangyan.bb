@@ -4,7 +4,7 @@ require recipes-kernel/linux/linux-dtb.inc
 SUMMARY = "Linux kernel for Fangyan imx6 boards"
 
 SRC_URI = " \
-    ssh://git@192.168.3.200:10022/imx6/fsl-linux.git;branch=${SRCBRANCH};protocol=ssh \
+    git://git@192.168.3.200:10022/imx6/fsl-linux.git;branch=${SRCBRANCH};protocol=ssh \
 "
 
 PE = "1"

@@ -12,7 +12,7 @@ PV = "2014.10+git${SRCPV}"
 SRCBRANCH = "v2014.10"
 SRCREV = "${AUTOREV}"
 SRC_URI = " \ 
-    ssh://git@192.168.3.200:10022/imx6/das-uboot.git;branch=${SRCBRANCH};protocol=ssh \
+    git://git@192.168.3.200:10022/imx6/das-uboot.git;branch=${SRCBRANCH};protocol=ssh \
 "
 S = "${WORKDIR}/git"
 
