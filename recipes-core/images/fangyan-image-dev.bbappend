@@ -2,6 +2,7 @@ IMAGE_FSTYPES += "ext4"
 #IMAGE_INSTALL += "mmdc"
 
 IMAGE_INSTALL += "initscript-resize2fs eglinfo-fb \
+	mpeg2decg2d \
 "
 
 IMAGE_INSTALL_append_imx6qwisehmi += " \
