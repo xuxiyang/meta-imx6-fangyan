@@ -7,7 +7,7 @@ inherit autotools
 PR = "r0"
 PV = "1.0"
 SRCBRANCH = "master"
-SRCREV = "80c48f5c4488fa1439d10c9ebedb0e995de2661e"
+SRCREV = "9beb2828719265e9d823b3bf3dd2f8d8a8579b05"
 
 SRC_URI = "git://git@192.168.3.200:10022/utils/libmpeg2.git;branch=${SRCBRANCH};protocol=ssh"
 S = "${WORKDIR}/git"
