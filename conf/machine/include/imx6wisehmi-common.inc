@@ -14,6 +14,8 @@ PREFERRED_PROVIDER_u-boot = "u-boot-imx6-fangyan"
 PREFERRED_PROVIDER_virtual/kernel = "linux-imx6-fangyan"
 #PREFERRED_VERSION_linux-imx6-fangyan = "3.14.52"
 
+PREFERRED_PROVIDER_busybox = "busybox-fangyan"
+
 PREFERRED_PROVIDER_jpeg = "libjpeg-turbo"
 
 PREFERRED_VERSION_glmark2 = "git"
