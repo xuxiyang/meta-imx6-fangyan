@@ -14,21 +14,12 @@ S = "${WORKDIR}/git"
 # prevent already-stripped QA Issue
 INHIBIT_SYSROOT_STRIP = "1"
 
-INITSCRIPT_NAME = "init-procmanager"
-INITSCRIPT_PARAMS = "start 00 5 . stop 00 6 ."
-
-inherit update-rc.d
-
 do_compile () {
     make
 }
 
 do_install() {
     install -d ${D}${bindir}
-    install -d ${D}${sysconfdir}
-    install -d ${D}${sysconfdir}/init.d/
     install -m 755 ${B}/procManager ${D}${bindir}
-    install -m 755 ${B}/procmanager.ini ${D}${sysconfdir}
-    install -m 755 ${B}/S00procmanager ${D}${sysconfdir}/init.d/init-procmanager
 }
 
