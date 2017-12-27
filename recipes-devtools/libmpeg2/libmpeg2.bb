@@ -6,8 +6,8 @@ inherit autotools
 
 PR = "r0"
 PV = "1.0"
-SRCBRANCH = "master"
-SRCREV = "9beb2828719265e9d823b3bf3dd2f8d8a8579b05"
+SRCBRANCH = "waitplay-dev"
+SRCREV = "${AUTOREV}"
 
 SRC_URI = "git://git@192.168.3.200:10022/utils/libmpeg2.git;branch=${SRCBRANCH};protocol=ssh"
 S = "${WORKDIR}/git"
@@ -25,6 +25,6 @@ FILES_mpeg2decg2d = "${bindir}/mpeg2dec ${libdir}/libmpeg2.so.0"
 do_install() {
     install -d ${D}${bindir}
     install -d ${D}${libdir}
-    install -m 755 ${B}/src/mpeg2dec ${D}${bindir}
+    install -m 755 ${B}/src/.libs/mpeg2dec ${D}${bindir}
     install -m 755 ${B}/libmpeg2/.libs/libmpeg2.so.0.1.0 ${D}${libdir}/libmpeg2.so.0
 }
