@@ -6,7 +6,8 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/${LICENSE};md5=0835ade698e0bcf8
 PR = "r0"
 PV = "1.0"
 SRCBRANCH = "master"
-SRCREV = "${AUTOREV}"
+#SRCREV = "${AUTOREV}"
+SRCREV = "84bcbfb3876f7f04693def685562e3942d80bb11"
 
 SRC_URI = "git://git@192.168.3.200:10022/utils/procManager.git;branch=${SRCBRANCH};protocol=ssh"
 S = "${WORKDIR}/git"
